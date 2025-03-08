@@ -1,5 +1,7 @@
 class PostsController < ApplicationController
   before_action :set_post, only: %i[ show edit update destroy ]
+  before_action :authenticate_user!, except: %i[ index show ]
+  before_action :verify_post_owner, except: %i[ index show new ]
 
   # GET /posts or /posts.json
   def index
@@ -22,6 +24,7 @@ class PostsController < ApplicationController
   # POST /posts or /posts.json
   def create
     @post = Post.new(post_params)
+    @post.user= current_user
 
     respond_to do |format|
       if @post.save
@@ -66,5 +69,12 @@ class PostsController < ApplicationController
     # Only allow a list of trusted parameters through.
     def post_params
       params.expect(post: [ :body ])
+    end
+
+    # Verify if user is the owner of the post ?
+    def verify_post_owner
+      if current_user.email != @post.user.email
+        redirect_to root_path, notice: "You are not authorized to edit or delete the posts of other!"
+      end
     end
 end
