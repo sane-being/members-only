@@ -1,7 +1,7 @@
 class PostsController < ApplicationController
   before_action :set_post, only: %i[ show edit update destroy ]
   before_action :authenticate_user!, except: %i[ index show ]
-  before_action :verify_post_owner, except: %i[ index show new ]
+  before_action :verify_post_owner, only: %i[ edit update destroy ]
 
   # GET /posts or /posts.json
   def index
